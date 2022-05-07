@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 
@@ -7,56 +8,56 @@ app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 5000;
 
-const uri = "mongodb://dbuser70:xDJRDr0RMLQeUXXD@cluster0-shard-00-00.p9dxu.mongodb.net:27017,cluster0-shard-00-01.p9dxu.mongodb.net:27017,cluster0-shard-00-02.p9dxu.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-ldkzjq-shard-0&authSource=admin&retryWrites=true&w=majority";
+const uri = `mongodb://${process.env.DB_BIKE}:${process.env.DB_PASS}@cluster0-shard-00-00.spmf5.mongodb.net:27017,cluster0-shard-00-01.spmf5.mongodb.net:27017,cluster0-shard-00-02.spmf5.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-f0zpwi-shard-0&authSource=admin&retryWrites=true&w=majority`;;
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run() {
     try {
         await client.connect();
-        const userCollection = client.db("foodExpress").collection("user");
-        //get user 
-        app.get('/user', async (req, res) => {
+        const bikeCollection = client.db("ware-house").collection("Bikes");
+        //get bike 
+        app.get('/bikes', async (req, res) => {
             const query = {};
-            const cursor = userCollection.find(query);
-            const users = await cursor.toArray();
-            res.send(users);
+            const cursor = bikeCollection.find(query);
+            const bikes = await cursor.toArray();
+            res.send(bikes);
         })
 
-        app.get('/user/:id', async (req, res) => {
+        app.get('/bike/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const result = await userCollection.findOne(query);
+            const result = await bikeCollection.findOne(query);
             res.send(result);
         })
-        //post user: add   new user 
-        app.post('/user', async (req, res) => {
-            const newUser = req.body;
-            console.log('Adding New User', newUser);
-            const result = await userCollection.insertOne(newUser);
+        //post bike: add   new bike 
+        app.post('/bike', async (req, res) => {
+            const newBike = req.body;
+            console.log('Adding New bike', newBike);
+            const result = await bikeCollection.insertOne(newBike);
             res.send(result);
         });
-        //update user
-        app.put('/user/:id', async (req, res) => {
+        //update bike
+        app.put('/inventory/:id', async (req, res) => {
             const id = req.params.id;
-            const updatedUser = req.body;
+            const updatedBike = req.body;
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
-                    name: updatedUser.name,
-                    email: updatedUser.email
+                    name: updatedBike.name,
+                    email: updatedBike.email
                 }
             };
-            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const result = await bikeCollection.updateOne(filter, updateDoc, options);
             res.send(result);
 
         })
-        //delete a user
-        app.delete('/user/:id', async (req, res) => {
+        //delete a bike
+        app.delete('/inventory/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const result = await userCollection.deleteOne(query);
+            const result = await bikeCollection.deleteOne(query);
             res.send(result);
 
         })
