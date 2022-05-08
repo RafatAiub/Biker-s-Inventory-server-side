@@ -30,8 +30,8 @@ async function run() {
             const result = await bikeCollection.findOne(query);
             res.send(result);
         })
-        //post bike: add   new bike 
-        app.post('/bike', async (req, res) => {
+        //post bike: add new bike 
+        app.post('/bikes', async (req, res) => {
             const newBike = req.body;
             console.log('Adding New bike', newBike);
             const result = await bikeCollection.insertOne(newBike);
